@@ -2,6 +2,7 @@ package com.codingwithmitch.espressouitestexamples.ui.movie
 
 import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.Espresso.pressBack
+import androidx.test.espresso.IdlingRegistry
 import androidx.test.espresso.action.ViewActions.click
 import androidx.test.espresso.assertion.ViewAssertions.matches
 import androidx.test.espresso.contrib.RecyclerViewActions.actionOnItemAtPosition
@@ -10,7 +11,10 @@ import androidx.test.ext.junit.rules.ActivityScenarioRule
 import androidx.test.internal.runner.junit4.AndroidJUnit4ClassRunner
 import com.codingwithmitch.espressouitestexamples.R
 import com.codingwithmitch.espressouitestexamples.data.FakeMovieData
+import com.codingwithmitch.espressouitestexamples.util.EspressoIdlingResource
+import org.junit.After
 import org.junit.Assert.*
+import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -20,6 +24,16 @@ import org.junit.runner.RunWith
 class MyMovieListFragmentTest{
     @get: Rule
     val activityRule = ActivityScenarioRule(MainActivity::class.java)
+
+    @Before
+    fun registerIdlingResource(){
+        IdlingRegistry.getInstance().register(EspressoIdlingResource.countingIdlingResource)
+    }
+
+    @After
+    fun unregisterIdlingResource(){
+        IdlingRegistry.getInstance().unregister(EspressoIdlingResource.countingIdlingResource)
+    }
 
     val listItemInTest = 4
     val movieInTest = FakeMovieData.movies[listItemInTest]
@@ -80,7 +94,6 @@ class MyMovieListFragmentTest{
                 actionOnItemAtPosition<MoviesListAdapter.MovieViewHolder>(
                     listItemInTest,
                     click()))
-
         onView(withId(R.id.movie_title)).check(matches(withText(movieInTest.title)))
 
         onView(withId(R.id.movie_star_actors)).perform(click())
